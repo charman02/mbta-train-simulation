@@ -1,9 +1,9 @@
 /*
  *  MetroSim.cpp
- *  Charlie Man
+ *  Charles Man
  *  2/12/23
  *
- *  COMP 15 Proj 1 MetroSim
+ *  MetroSim
  *
  *  Purpose: This is the class implemenetation for MetroSim. It contains the
  *           main functionality of running MetroSim, moving trains and

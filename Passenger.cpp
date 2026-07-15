@@ -1,9 +1,9 @@
 /*
  *  Passenger.cpp
- *  Charlie Man
+ *  Charles Man
  *  2/12/23
  *
- *  COMP 15 Proj 1 MetroSim
+ *  MetroSim
  *
  *  Purpose: This is the implementation for the print function of the
  *           Passenger struct.

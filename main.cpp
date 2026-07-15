@@ -1,9 +1,9 @@
 /*
  *  main.cpp
- *  Charlie Man
+ *  Charles Man
  *  2/12/23
  *
- *  COMP 15 Proj 1 MetroSim
+ *  MetroSim
  *
  *  Purpose: This is the Main file that handles simple driver functions such
  *           as opening and reading in given input files.

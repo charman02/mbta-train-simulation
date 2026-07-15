@@ -1,9 +1,9 @@
 /*
  *  Passenger.h
- *  Charlie Man
+ *  Charles Man
  *  2/12/23
  *
- *  COMP 15 Proj 1 MetroSim
+ *  MetroSim
  *
  *  Purpose: This is the interface for the Passenger struct. It contains
  *           three variables: ID, departure station, and arrival station.
