@@ -1,28 +1,122 @@
-# Compile/run:
-     make MetroSim
-     ./MetroSim stationsFile passFile [commands]
+# MetroSim — MBTA Green Line Extension Simulator
 
+A command-driven simulation of a train running a simplified loop of the MBTA
+Green Line Extension. Passengers wait at stations, board the train, ride to
+their destination, and disembark. The program tracks the full state of every
+station and the train after each command.
 
-# Program Purpose:
-The purpose of this program is to design and implement a program that monitors a simulation of a train traveling a simplified course of the Green Line Extension, managing Passengers as they board and depart at specified stops along the way. There are three main, high-level tasks for this program. The first is to create an interactive front-end simulation that works with both files and the command line. The second is to design and develop an object-oriented approach to solving the back-end logic for the simulation. The third is to connect the front-end and back-end systems.
+Written in C++ as an exercise in object-oriented design and building an
+interactive front end on top of a queue-based back end.
 
-# Files: 
-main.cpp: Main file should be short and handle simple driver functions such as reading in files.
+## Build
 
-MetroSim.cpp: Implementation of MetroSim class. Main functionality of running the Metro Simulation, should be able to move trains and deal with passengers going on/off the train.
+```bash
+make MetroSim
+```
 
-MetroSim.h: Interface of MetroSim class.
+The Makefile uses `clang++` by default. To build with `g++` instead:
 
-stations.txt: An example file containing a list of stations.
+```bash
+make MetroSim CXX=g++
+```
 
-test_commands.txt: Sample list of commands that you could give to the simulator.
+## Run
 
-the_metroSim: Reference implementation for students to see how 
+```bash
+./MetroSim stationsFile outputFile [commandsFile]
+```
 
-# Data Structures:
-Passenger was given to us as a struct consisting of their ID, departure station, and arrival station. I included a vector of type Passenger as a private member function of the PassengerQueue class to represent PassengerQueues. In MetroSim.h, I created a Station struct made up of a name, number, and PassengerQueue. Within the MetroSim class, I used a Stations vector, and a vector made up of PassengerQueues to represent the train. Each element of the train vector essentially represents a "car" designated for passengers getting off at a specific station (index of train car represents station number).
+- `stationsFile` — input file listing the stations on the line (one per line).
+- `outputFile` — file the simulator writes to whenever a passenger leaves the
+  train (e.g. `Passenger 1 left train at station Gilman Square`).
+- `commandsFile` — *optional*. If given, commands are read from this file
+  (batch mode). If omitted, commands are read interactively from standard input.
 
-# Testing:
-For the Passenger struct and PassengerQueue class, I used unit tests for testing their member functions. My general methods of testing were using sizes of 0, 1, and 3 for PassengerQueues, and calling the same function consecutively to test that it worked every time. I verified the tests using assert statements that checked for correct Passengers and PassengerQueues.
+Sample data files are included, so you can try it immediately:
 
-For testing MetroSim, I used diff testing to compare my program to the reference. I created a selection of .txt files to use as command files, considering various base and edge cases. One of the base cases I tested for was if a command file ends on end-of-file rather than a "m f" command, and a major problem I encountered was not fully understanding what redirecting standard output and input really meant. In this base case I tried to send the contents of the file to std::cin, but the program wouldn't end because MetroSim only ends through the command line when "m f" is inputted. Other base cases that I tested included adding Passengers whose arrival stations were before, the same as, or after their departure stations. I also tested for ending the simulation while a passenger was still on the train or waiting at a station. These were relatively simple base cases that I thought of during the implementation of my add_passenger and metro_move functions. I tested these base cases after implementing my program, which, in hindsight, was risky had my program failed to succeed in these tests. During the implementation stages, I was mostly using main.cpp and test_main.cpp to implement each function one-by-one and run the program each time using the test_commands file. Next time, I will likely plan to include more unit tests during the implementation stages on top of my test .txt files to check on my progress. In terms of edge cases, the main one I tested for was the train looping around the stations twice. I also made a larger stations file containing 30 stations, to test if my program would still run the same as the demo.
+```bash
+# Batch mode — runs the bundled command script
+./MetroSim stations.txt out.txt test_commands.txt
+
+# Interactive mode — type commands yourself
+./MetroSim stations.txt out.txt
+```
+
+## Commands
+
+| Command      | Meaning                                                        |
+|--------------|----------------------------------------------------------------|
+| `p <from> <to>` | Add a passenger boarding at station `<from>`, bound for `<to>` (station indices). |
+| `m m`        | Move the train forward one station (loops back to the start at the end of the line). |
+| `m f`        | End the simulation.                                            |
+
+After every command the simulator prints the passengers currently on the train
+and the full list of stations, marking the train's current location with
+`TRAIN:`.
+
+### Example
+
+Given `stations.txt`:
+
+```
+Lechmere
+Union Square
+Gilman Square
+Magoun Square
+Ball Square
+Medford/Tufts
+```
+
+the command `p 0 2` adds passenger 1 at Lechmere (station 0) bound for Gilman
+Square (station 2). After two `m m` commands the train reaches Gilman Square,
+passenger 1 disembarks, and `out.txt` records:
+
+```
+Passenger 1 left train at station Gilman Square
+```
+
+## Design
+
+The simulation is split into a small driver, a back-end data model, and the
+`MetroSim` class that ties them together.
+
+- **`Passenger`** — a struct holding the passenger's `id`, departure station
+  (`from`), and arrival station (`to`).
+- **`PassengerQueue`** — a FIFO queue of `Passenger`s, backed by a `vector`.
+  Used both for the line waiting at each station and for the train's cars.
+- **`Station`** — a struct pairing a station name and number with the
+  `PassengerQueue` of people waiting there.
+- **`MetroSim`** — owns a `vector<Station>` for the line and a
+  `vector<PassengerQueue>` for the train. The train vector is indexed by
+  *destination station number*: a passenger riding to station `k` is held in
+  train car `k`. When the train arrives at station `k`, everyone in car `k`
+  disembarks — no scanning required.
+
+When a passenger is added they enqueue at their departure station. On `m m`,
+everyone waiting at the current station boards the train (moving into the car
+for their destination), the train advances one stop (wrapping around at the
+end), and anyone whose destination matches the new stop leaves the train and is
+logged to the output file.
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| `main.cpp` | Driver: parses arguments, opens files, starts the simulation loop. |
+| `MetroSim.h` / `MetroSim.cpp` | The `MetroSim` class — simulation state, command handling, and printing. |
+| `Passenger.h` / `Passenger.cpp` | The `Passenger` struct and its print routine. |
+| `PassengerQueue.h` / `PassengerQueue.cpp` | FIFO queue of passengers used for stations and train cars. |
+| `unit_tests.h` | Unit tests for `Passenger` and `PassengerQueue`. |
+| `stations.txt` | Sample stations file (the six GLX stations above). |
+| `test_commands.txt` | Sample command script for batch mode. |
+| `Makefile` | Build rules. |
+
+## Testing
+
+`Passenger` and `PassengerQueue` are covered by unit tests in `unit_tests.h`
+(queue sizes of 0, 1, and 3; repeated `enqueue`/`dequeue`/`front` calls; print
+formatting). The end-to-end simulation was validated with diff testing against
+a reference implementation across a range of cases: command files ending on
+EOF rather than `m f`, arrival stations before/equal to/after departure,
+ending the run with passengers still on the train or waiting, and the train
+looping the line more than once.

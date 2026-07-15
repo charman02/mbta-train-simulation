@@ -1,0 +1,7 @@
+p 0 2
+p 1 4
+m m
+m m
+m m
+m m
+m f
