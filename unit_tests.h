@@ -1,9 +1,9 @@
 /*
  *  unit_tests.h
- *  Charlie Man
+ *  Charles Man
  *  2/2/23
  *
- *  CS 15 Proj 1 MetroSim
+ *  MetroSim
  *
  *  Purpose: This file contains all unit tests for testing the member
  *           functions of the Passenger struct and PassengerQueue class.

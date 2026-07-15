@@ -1,9 +1,9 @@
 /*
  *  MetroSim.h
- *  Charlie Man
+ *  Charles Man
  *  2/12/23
  *
- *  COMP 15 Proj 1 MetroSim
+ *  MetroSim
  *
  *  Purpose: This is the class interface for MetroSim. It contains all
  *           of the public and private member functions and variables for the

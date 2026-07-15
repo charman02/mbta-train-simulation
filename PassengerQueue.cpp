@@ -1,9 +1,9 @@
 /*
  *  PassengerQueue.cpp
- *  Charlie Man
+ *  Charles Man
  *  2/12/23
  *
- *  COMP 15 Proj 1 MetroSim
+ *  MetroSim
  *
  *  Purpose: This is the class implemenetation for PassengerQueue. It contains
  *           all definitions for both public and private member functions of
